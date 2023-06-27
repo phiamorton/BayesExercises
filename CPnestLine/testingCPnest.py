@@ -3,6 +3,7 @@ import raynest.model
 import numpy as np
 import matplotlib.pyplot as plt 
 #print('raynest')
+from corner import corner
 
 class Line(raynest.model.Model):
 
@@ -44,6 +45,11 @@ for i in range(len(x)):
 
 mymodel= Line(x,y,sig_y)
 nest = raynest.raynest(mymodel, verbose=2, nnest=1, nensemble=1, nlive=1000, maxmcmc=5000)
-nest.run()
-    
+nest.run(corner = True)
+post = nest.posterior_samples.ravel()
+
+samples = np.column_stack([post[lab] for lab in mymodel.names])
+fig = corner(samples, labels = ['$a$','$b$'], truths=[a_val,b_val])
+fig.savefig('joint_posterior.pdf', bbox_inches = 'tight')
+
 
